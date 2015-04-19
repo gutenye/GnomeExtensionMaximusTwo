@@ -2,6 +2,7 @@ const GLib = imports.gi.GLib;
 const Mainloop = imports.mainloop;
 const Meta = imports.gi.Meta;
 const Util = imports.misc.util;
+const MAXIMIZED = (Meta.MaximizeFlags.HORIZONTAL | Meta.MaximizeFlags.VERTICAL);
 
 function LOG(message) {
 	// log("[maximus-two]: " + message);
@@ -122,7 +123,17 @@ function setHideTitlebar(win, hide, stopAdding) {
 		cmd[2] = win.get_title();
 	}
 	LOG(cmd.join(' '));
-	Util.spawn(cmd);
+	Util.spawn(cmd)
+	if (hide) {
+		let cmd_toggle = ['wmctrl', '-i', '-r' , id , '-b', 'toggle,maximized_vert,maximized_horz'];
+		let cmd_full = ['wmctrl', '-i', '-r' , id , '-b', 'add,maximized_vert,maximized_horz'];
+
+		if (win.get_maximized() === MAXIMIZED && !win.minimized) {
+			Util.spawn(cmd_toggle);
+			Util.spawn(cmd_toggle);
+			Util.spawn(cmd_full);
+		}
+	}
 }
 
 /**** Callbacks ****/
